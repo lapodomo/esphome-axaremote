@@ -5,11 +5,7 @@ namespace esphome {
 namespace axaremote {
 
 static const char *const TAG = "axaremote.cover";
-void cover_axaremote::register_properties() {
-  // Registreer deze property zodat YAML het accepteert
-  register_boolean_property("serial_status_leading", &cover_axaremote::get_serial_status_leading,
-                            &cover_axaremote::set_serial_status_leading);
-}
+
 bool cover_axaremote::get_serial_status_leading() const { return serial_status_leading_; }
 void cover_axaremote::set_serial_status_leading(bool val) { serial_status_leading_ = val; }
 
