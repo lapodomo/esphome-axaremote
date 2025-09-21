@@ -44,7 +44,7 @@ public:
 	cover::CoverTraits get_traits() override;
 	void set_close_duration(uint32_t close_duration);
 	void set_auto_calibrate(bool auto_calibrate) { this->auto_calibrate_ = auto_calibrate; }
-    void set_serial_status_leading(bool val);
+    void set_serial_status_leading(bool serial_status_leading){ this->serial_status_leading_ = serial_status_leading; }
 	void loop();
 
 protected:
