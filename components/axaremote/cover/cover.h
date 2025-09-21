@@ -44,6 +44,7 @@ public:
 	cover::CoverTraits get_traits() override;
 	void set_close_duration(uint32_t close_duration);
 	void set_auto_calibrate(bool auto_calibrate) { this->auto_calibrate_ = auto_calibrate; }
+    void set_serial_status_leading(bool val);
 	void loop();
 
 protected:
@@ -55,7 +56,7 @@ protected:
 	float close_duration_;
 	float lock_duration_;
 	bool auto_calibrate_ = false;
-
+    bool serial_status_leading_ = true;  // standaard aan
 	uint32_t last_recompute_time_{0};
 	uint32_t start_close_time_{0};
 	uint32_t last_publish_time_{0};
@@ -64,7 +65,6 @@ protected:
 	float last_position_{0};
 	float lock_position_{0};
 	bool lock_cleared_ = false;
-    bool serial_status_leading_ = true;  // standaard: seriële status leidend
 
 	cover::CoverOperation last_operation_{cover::COVER_OPERATION_OPENING};
 
