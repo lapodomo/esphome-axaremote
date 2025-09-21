@@ -93,10 +93,10 @@ void AXARemoteCover::loop() {
   const uint32_t now = millis();
 
   if (this->serial_status_leading_) {
-    // Seriële status leidend: stuur STATUS commando en verwerk response
     AXAResponseCode response = this->send_cmd_(AXACommand::STATUS);
 
-    if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_IDLE && this->position != cover::COVER_CLOSED) {
+    if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) &&
+        this->current_operation == cover::COVER_OPERATION_IDLE && this->position != cover::COVER_CLOSED) {
       ESP_LOGD(TAG, "Closed with remote?");
       this->position = cover::COVER_CLOSED;
       this->last_position_ = cover::COVER_CLOSED;
@@ -105,9 +105,11 @@ void AXARemoteCover::loop() {
       this->current_operation = cover::COVER_OPERATION_IDLE;
       this->publish_state();
       return;
-    } else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_OPENING && !this->lock_cleared_) {
+    } else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) &&
+               this->current_operation == cover::COVER_OPERATION_OPENING && !this->lock_cleared_) {
       // Ignore locked responses while opening, lock not cleared yet.
-    } else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_OPENING && this->lock_cleared_) {
+    } else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) &&
+               this->current_operation == cover::COVER_OPERATION_OPENING && this->lock_cleared_) {
       ESP_LOGD(TAG, "Closed with remote while opening?");
       this->position = cover::COVER_CLOSED;
       this->last_position_ = cover::COVER_CLOSED;
@@ -116,7 +118,8 @@ void AXARemoteCover::loop() {
       this->current_operation = cover::COVER_OPERATION_IDLE;
       this->publish_state();
       return;
-    } else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_CLOSING) {
+    } else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) &&
+               this->current_operation == cover::COVER_OPERATION_CLOSING) {
       if (this->last_position_ == cover::COVER_OPEN) {
         uint32_t close_duration = now - this->start_close_time_;
         ESP_LOGI(TAG, "Full Close Duration: %.1fs", close_duration / 1e3f);
@@ -130,7 +133,8 @@ void AXARemoteCover::loop() {
       this->current_operation = cover::COVER_OPERATION_IDLE;
       this->publish_state();
       return;
-    } else if (response == AXAResponseCode::Unlocked && this->position == cover::COVER_CLOSED && this->current_operation == cover::COVER_OPERATION_IDLE) {
+    } else if (response == AXAResponseCode::Unlocked && this->position == cover::COVER_CLOSED &&
+               this->current_operation == cover::COVER_OPERATION_IDLE) {
       ESP_LOGD(TAG, "Opened with remote?");
       this->position = cover::COVER_CLOSED;
       this->last_position_ = cover::COVER_CLOSED;
@@ -153,20 +157,26 @@ void AXARemoteCover::loop() {
     if (this->current_operation == cover::COVER_OPERATION_OPENING) {
       uint32_t open_time_elapsed = now - this->last_recompute_time_;
       if (open_time_elapsed >= this->open_duration_) {
-        this->position = cover::COVER_OPEN;
-        this->last_position_ = cover::COVER_OPEN;
-        this->current_operation = cover::COVER_OPERATION_IDLE;
-        this->publish_state();
-        ESP_LOGI(TAG, "Cover fully opened after %.1fs", open_time_elapsed / 1000.0f);
+        if (now - this->last_publish_time_ > 1000) {  // minimaal 1 sec interval
+          this->position = cover::COVER_OPEN;
+          this->last_position_ = cover::COVER_OPEN;
+          this->current_operation = cover::COVER_OPERATION_IDLE;
+          this->publish_state();
+          ESP_LOGI(TAG, "Cover fully opened after %.1fs", open_time_elapsed / 1000.0f);
+          this->last_publish_time_ = now;
+        }
       }
     } else if (this->current_operation == cover::COVER_OPERATION_CLOSING) {
       uint32_t close_time_elapsed = now - this->start_close_time_;
       if (close_time_elapsed >= this->close_duration_) {
-        this->position = cover::COVER_CLOSED;
-        this->last_position_ = cover::COVER_CLOSED;
-        this->current_operation = cover::COVER_OPERATION_IDLE;
-        this->publish_state();
-        ESP_LOGI(TAG, "Cover fully closed after %.1fs", close_time_elapsed / 1000.0f);
+        if (now - this->last_publish_time_ > 1000) {
+          this->position = cover::COVER_CLOSED;
+          this->last_position_ = cover::COVER_CLOSED;
+          this->current_operation = cover::COVER_OPERATION_IDLE;
+          this->publish_state();
+          ESP_LOGI(TAG, "Cover fully closed after %.1fs", close_time_elapsed / 1000.0f);
+          this->last_publish_time_ = now;
+        }
       }
     }
   }
