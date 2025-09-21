@@ -93,7 +93,7 @@ void AXARemoteCover::set_close_duration(uint32_t close_duration) {
 void AXARemoteCover::loop() {
   static uint32_t last_status_time = 0;
   const uint32_t now = millis();
-  if (now - last_status_time < 300)  // minimum 300 ms tussen statusvragen
+  if (now - last_status_time < 2000)  // minimum 300 ms tussen statusvragen
     return;
 
   last_status_time = now;
