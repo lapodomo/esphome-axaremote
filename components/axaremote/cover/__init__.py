@@ -11,13 +11,16 @@ axaremote_ns = cg.esphome_ns.namespace('axaremote')
 AXARemoteCover = axaremote_ns.class_('AXARemoteCover', cg.Component, cover.Cover, uart.UARTDevice)
 
 CONF_AUTO_CALIBRATE = "auto_calibrate"
+CONF_SERIAL_STATUS = "serial_status_leading"
+
+
 
 CONFIG_SCHEMA = cover.cover_schema(AXARemoteCover).extend(
     {
         cv.GenerateID(): cv.declare_id(AXARemoteCover),
         cv.Optional(CONF_CLOSE_DURATION, default="50s"): cv.positive_time_period_milliseconds,
         cv.Optional(CONF_AUTO_CALIBRATE, default=False): bool,
-        cv.Optional(CONF_serial_status_leading, default=True): bool,
+        cv.Optional(CONF_SERIAL_STATUS, default=True): bool,
     }
 ).extend(uart.UART_DEVICE_SCHEMA)
 
@@ -30,4 +33,4 @@ async def to_code(config):
 
     cg.add(var.set_close_duration(config[CONF_CLOSE_DURATION]))
     cg.add(var.set_auto_calibrate(config[CONF_AUTO_CALIBRATE]))
-    cg.add(var.set_serial_status_leading(config[CONF_serial_status_leading]))
+    cg.add(var.set_serial_status_leading(config[CONF_SERIAL_STATUS]))
