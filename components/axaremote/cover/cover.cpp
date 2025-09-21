@@ -149,6 +149,7 @@ void AXARemoteCover::loop() {
         this->last_position_ = cover::COVER_CLOSED;
         this->current_operation = cover::COVER_OPERATION_OPENING;
         this->lock_position_ = 0.2f;
+        this->start_open_time_ = now;       // Start open timer hier ook zetten
         this->last_recompute_time_ = now;
         this->publish_state();
         this->last_publish_time_ = now;
@@ -163,9 +164,10 @@ void AXARemoteCover::loop() {
     } else {
       ESP_LOGV(TAG, "Response: %d", response);
     }
-  } else {  // Tijd-gebaseerde modus
+  } else {
+    // Tijd-gebaseerde status update zonder seriële check
     if (this->current_operation == cover::COVER_OPERATION_OPENING) {
-      uint32_t open_time_elapsed = now - this->last_recompute_time_;
+      uint32_t open_time_elapsed = now - this->start_open_time_;
       if (open_time_elapsed >= this->open_duration_) {
         if (now - this->last_publish_time_ > 1000) {
           this->position = cover::COVER_OPEN;
@@ -215,7 +217,6 @@ void AXARemoteCover::loop() {
     this->last_log_time_ = now;
   }
 }
-
 void AXARemoteCover::control(const cover::CoverCall &call) {
 	if (call.get_stop()) {
 		this->start_direction_(cover::COVER_OPERATION_IDLE);
@@ -271,6 +272,7 @@ void AXARemoteCover::start_direction_(cover::CoverOperation dir) {
 		this->last_operation_ = dir;
 		if(this->position > cover::COVER_CLOSED)
 			this->last_position_ = this->position;
+		this->start_open_time_ = now;  // Tijdstip starten openen
 		this->send_cmd_(AXACommand::OPEN);
 		break;
 	case cover::COVER_OPERATION_CLOSING:
