@@ -5,12 +5,17 @@ namespace esphome {
 namespace axaremote {
 
 static const char *const TAG = "axaremote.cover";
-void AXARemoteCover::set_serial_status_leading(bool val) {
-  this->serial_status_leading_ = val;
+void cover_axaremote::register_properties() {
+  // Registreer deze property zodat YAML het accepteert
+  register_boolean_property("serial_status_leading", &cover_axaremote::get_serial_status_leading,
+                            &cover_axaremote::set_serial_status_leading);
 }
+bool cover_axaremote::get_serial_status_leading() const { return serial_status_leading_; }
+void cover_axaremote::set_serial_status_leading(bool val) { serial_status_leading_ = val; }
+
 void AXARemoteCover::setup() {
 	ESP_LOGCONFIG(TAG, "Setting up AXA Remote cover...");
-
+    this->cover_.set_serial_status_leading(this->serial_status_leading_);
 	// Clear the serial buffer
 	this->write_str("\r\n");
 	esphome::delay(20);
