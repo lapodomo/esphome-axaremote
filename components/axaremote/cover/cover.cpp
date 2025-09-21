@@ -33,6 +33,8 @@ void AXARemoteCover::setup() {
 //			this->send_cmd_(AXACommand::OPEN);
 //			esphome::delay(this->unlock_duration_ / 2);
 			this->send_cmd_(AXACommand::CLOSE);
+			delay(50);
+			this->send_cmd_(AXACommand::CLOSE);
 		}
 
 		if(this->position > 0.0f) {
@@ -274,12 +276,16 @@ void AXARemoteCover::start_direction_(cover::CoverOperation dir) {
 			this->last_position_ = this->position;
 		this->start_open_time_ = now;  // Tijdstip starten openen
 		this->send_cmd_(AXACommand::OPEN);
+		delay(50);
+		this->send_cmd_(AXACommand::OPEN);
 		break;
 	case cover::COVER_OPERATION_CLOSING:
 		this->last_operation_ = dir;
 		if(this->position < cover::COVER_OPEN)
 			this->last_position_ = this->position;
 		this->start_close_time_ = now;
+		this->send_cmd_(AXACommand::CLOSE);
+		delay(50);
 		this->send_cmd_(AXACommand::CLOSE);
 		break;
 	default:
