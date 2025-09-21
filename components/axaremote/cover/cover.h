@@ -64,6 +64,8 @@ protected:
 	float last_position_{0};
 	float lock_position_{0};
 	bool lock_cleared_ = false;
+    bool serial_status_leading_ = true;  // standaard: seriële status leidend
+
 	cover::CoverOperation last_operation_{cover::COVER_OPERATION_OPENING};
 
 	void control(const cover::CoverCall &call) override;
