@@ -327,8 +327,6 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 		if(this->available() > 0) {
 			uint8_t c;
 			this->read_byte(&c);
-			      ESP_LOGD(TAG, "Received byte: 0x%02X ('%c')", c, (c >= 32 && c <= 126) ? c : '.');
-      ESP_LOGD(TAG, "Building response string: %s", response_.c_str());
 			if (response_.length() == 0 && c >= '0' && c <= '9')
 				response_code_ = (response_code_ * 10) + (c - '0');
 			else if (c == ' ' && response_.length() == 0) {
