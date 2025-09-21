@@ -30,4 +30,4 @@ async def to_code(config):
 
     cg.add(var.set_close_duration(config[CONF_CLOSE_DURATION]))
     cg.add(var.set_auto_calibrate(config[CONF_AUTO_CALIBRATE]))
-     cg.add(var.set_serial_status_leading(config[CONF_serial_status_leading]))
+    cg.add(var.set_serial_status_leading(config[CONF_serial_status_leading]))
