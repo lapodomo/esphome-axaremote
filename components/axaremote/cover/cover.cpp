@@ -362,7 +362,7 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
       delay(1);  // Korte pauze als geen data om CPU druk te verminderen
     }
 
-		if (millis() - now > 100) {
+		if (millis() - now > 10) {
 			ESP_LOGE(TAG, "Timeout while waiting for response!");
 			return AXAResponseCode::Invalid;
 		}
