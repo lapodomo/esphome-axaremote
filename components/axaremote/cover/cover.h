@@ -57,6 +57,7 @@ protected:
 	float lock_duration_;
 	bool auto_calibrate_ = false;
     bool serial_status_leading_ = true;  // standaard aan
+    uint32_t start_open_time_ = 0;
 	uint32_t last_recompute_time_{0};
 	uint32_t start_close_time_{0};
 	uint32_t last_publish_time_{0};
