@@ -349,11 +349,13 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 						ESP_LOGW(TAG, "Garbage received: %s", response_.c_str());
 					}
 				}
-				response_.erase();
-			}
-		}
+		response_.erase();
+      }
+    } else {
+      delay(1);  // Korte pauze als geen data om CPU druk te verminderen
+    }
 
-		if (millis() - now > 50) {
+		if (millis() - now > 100) {
 			ESP_LOGE(TAG, "Timeout while waiting for response!");
 			return AXAResponseCode::Invalid;
 		}
