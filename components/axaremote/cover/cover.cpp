@@ -94,6 +94,11 @@ void AXARemoteCover::loop() {
   const uint32_t now = millis();
 
   if (this->serial_status_leading_) {
+	      if (now - this->last_poll_time_ < this->polling_interval_) {
+        return;
+    }
+    this->last_poll_time_ = now;
+
     AXAResponseCode response = this->send_cmd_(AXACommand::STATUS);
 
     if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) &&
