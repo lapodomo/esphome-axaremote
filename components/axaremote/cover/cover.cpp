@@ -174,6 +174,7 @@ void AXARemoteCover::loop() {
   } else {
     // Tijd-gebaseerde status update zonder seriële check
     if (this->current_operation == cover::COVER_OPERATION_OPENING) {
+	if (now - this->last_publish_time_ > 1000) {	
       uint32_t open_time_elapsed = now - this->start_open_time_;
       if (open_time_elapsed >= this->open_duration_) {
         if (now - this->last_publish_time_ > 1000) {
@@ -184,8 +185,9 @@ void AXARemoteCover::loop() {
           ESP_LOGI(TAG, "Cover fully opened after %.1fs", open_time_elapsed / 1000.0f);
           this->last_publish_time_ = now;
         }
-      }
+      }}
     } else if (this->current_operation == cover::COVER_OPERATION_CLOSING) {
+		if (now - this->last_publish_time_ > 1000) {
       uint32_t close_time_elapsed = now - this->start_close_time_;
       if (close_time_elapsed >= this->close_duration_) {
         if (now - this->last_publish_time_ > 1000) {
@@ -198,6 +200,7 @@ void AXARemoteCover::loop() {
         }
       }
     }
+	}
   }
 
   this->recompute_position_();
