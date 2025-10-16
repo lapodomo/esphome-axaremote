@@ -363,7 +363,6 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 	this->flush();
 
 	const uint32_t now = millis();
-	this->last_cmd_time_ = now;
 
 	// Read the response.
 	bool echo_received = false;
