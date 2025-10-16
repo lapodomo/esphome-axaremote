@@ -334,7 +334,10 @@ bool AXARemoteCover::is_at_target_() const {
 AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &response) {
 	// Flush UART before sending command.
 	this->flush();
-
+    while(this->available()) {
+        uint8_t c;
+        this->read_byte(&c);
+    }
 	// Send the command.
 	if (cmd != AXACommand::STATUS) {
 		ESP_LOGD(TAG, "Command: %s", cmd.c_str());
@@ -384,7 +387,7 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
       delay(1);  // Korte pauze als geen data om CPU druk te verminderen
     }
 
-		if (millis() - now > 35) {
+		if (millis() - now > 100) {
 			ESP_LOGE(TAG, "Timeout while waiting for response!");
 			return AXAResponseCode::Invalid;
 		}
