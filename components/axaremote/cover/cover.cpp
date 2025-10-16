@@ -339,22 +339,36 @@ bool AXARemoteCover::is_at_target_() const {
 AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &response) {
 	// Flush UART before sending command.
 	this->flush();
-    while(this->available()) {
-        uint8_t c;
-        this->read_byte(&c);
-    }
+
+	// Read and clear the serial buffer
+	std::string garbage;
+	while(this->available()) {
+		uint8_t c;
+		this->read_byte(&c);
+		garbage += c;
+	}
+	if (garbage.length() > 0)
+		ESP_LOGD(TAG, "Garbage received: %s", garbage.c_str());
+
 	// Send the command.
-	if (cmd != AXACommand::STATUS) {
+	if (cmd == AXACommand::STATUS) {
+		ESP_LOGV(TAG, "Command: %s", cmd.c_str());
+	} else {
 		ESP_LOGD(TAG, "Command: %s", cmd.c_str());
 	}
 	this->write_str(cmd.c_str());
 	this->write_str("\r\n");
 
+	// Flush UART.
+	this->flush();
+
+	const uint32_t now = millis();
+	this->last_cmd_time_ = now;
+
 	// Read the response.
 	bool echo_received = false;
 	int response_code_ = 0;
 	std::string response_;
-	const uint32_t now = millis();
 	while(true) {
 		if(this->available() > 0) {
 			uint8_t c;
@@ -386,20 +400,19 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 						ESP_LOGW(TAG, "Garbage received: %s", response_.c_str());
 					}
 				}
-		response_.erase();
-      }
-    } else {
-      delay(1);  // Korte pauze als geen data om CPU druk te verminderen
-    }
-
-		if (millis() - now > 80) {
-			ESP_LOGE(TAG, "Timeout while waiting for response!");
-			return AXAResponseCode::Invalid;
+				response_.erase();
+			}
+		}
+		if (millis() - now > 25) {
+			ESP_LOGE(TAG, "Timeout while waiting for response");
+			break;
 		}
 	}
 
 	return AXAResponseCode::Invalid;
 }
+
+
 
 AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd) {
 	std::string s;
