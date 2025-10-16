@@ -2,7 +2,7 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import uart
 from esphome.components import cover
-from esphome.const import CONF_ID, CONF_CLOSE_DURATION
+from esphome.const import CONF_ID, CONF_CLOSE_DURATION, CONF_POLLING_INTERVAL
 
 CODEOWNERS = ["@rrooggiieerr"]
 DEPENDENCIES = ['cover', 'uart']
@@ -18,6 +18,7 @@ CONF_SERIAL_STATUS = "serial_status_leading"
 CONFIG_SCHEMA = cover.cover_schema(AXARemoteCover).extend(
     {
         cv.GenerateID(): cv.declare_id(AXARemoteCover),
+         cv.Optional(CONF_POLLING_INTERVAL, default="0s"): cv.positive_time_period_milliseconds,
         cv.Optional(CONF_CLOSE_DURATION, default="50s"): cv.positive_time_period_milliseconds,
         cv.Optional(CONF_AUTO_CALIBRATE, default=False): bool,
         cv.Optional(CONF_SERIAL_STATUS, default=True): bool,
@@ -30,7 +31,7 @@ async def to_code(config):
     await cg.register_component(var, config)
     await cover.register_cover(var, config)
     await uart.register_uart_device(var, config)
-
+    cg.add(var.set_polling_interval(config[CONF_POLLING_INTERVAL]))
     cg.add(var.set_close_duration(config[CONF_CLOSE_DURATION]))
     cg.add(var.set_auto_calibrate(config[CONF_AUTO_CALIBRATE]))
     cg.add(var.set_serial_status_leading(config[CONF_SERIAL_STATUS]))
