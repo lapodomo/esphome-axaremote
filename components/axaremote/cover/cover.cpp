@@ -218,6 +218,7 @@ void AXARemoteCover::loop() {
       this->last_position_ = this->position;
     }
     this->publish_state();
+			this->last_publish_time_ = now;
   }
   }
 
