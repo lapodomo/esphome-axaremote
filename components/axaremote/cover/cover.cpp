@@ -412,7 +412,7 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 			}
 		}
 		if (millis() - now > 150) {
-			ESP_LOGE(TAG, "Timeout while waiting for response");
+			ESP_LOGE(TAG, "Timeout while waiting for response 150ms");
 			break;
 		}
 	}
